@@ -6,9 +6,17 @@ module.exports = {
   findUserByUsername,
   findUserById,
   updateUser,
+  deleteUser,
+  addTeam,
+  findTeamById,
+  getUserTeams,
+  updateTeam,
+  deleteTeam,
   sendMessage,
   getMessages,
 };
+
+// User helpers
 
 async function addUser(user) {
   const [ new_id ] = await db('users').insert(user);
@@ -44,11 +52,51 @@ async function updateUser(user_id, changes) {
     .update(updatedInfo);
 }
 
-function removeUser(user_id) {
+function deleteUser(user_id) {
   return db('users')
     .where({ user_id })
     .del();
 }
+
+// Team helpers
+
+async function addTeam(team) {
+  const [ new_id ] = await db('teams').insert(team);
+  return findTeamById(new_id);
+}
+
+function findTeamById(team_id) {
+  return db('teams')
+  .where({ team_id })
+  .first();
+}
+
+function getUserTeams(user_id) {
+  return db('teams')
+  .select('*')
+  .where('user_id', user_id)
+  .orderBy('team_id');
+}
+
+async function updateTeam(team_id, team_datastring) {
+  const teamData = await findTeamById(team_id);
+  const updatedTeam = {
+    ...teamData,
+    team_datastring: team_datastring
+  }
+
+  return db('teams')
+    .where({ team_id })
+    .update(updatedTeam);
+}
+
+function deleteTeam(team_id) {
+  return db('teams')
+    .where({ team_id })
+    .del();
+}
+
+// Message helpers
 
 function sendMessage(from_id, to_id, message) {
   const newMessage = {

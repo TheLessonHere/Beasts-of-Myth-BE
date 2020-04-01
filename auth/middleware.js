@@ -7,6 +7,7 @@ module.exports = {
   checkUserCreds,
   checkUserExists,
   validateUserId,
+  validateTeamDatastring
 }
 
 function authenticate (req, res, next) {
@@ -68,3 +69,7 @@ function validateUserId(req, res, next) {
       next();
   }
 };
+
+function validateTeamDatastring(req, res, next) {
+  next();
+}
