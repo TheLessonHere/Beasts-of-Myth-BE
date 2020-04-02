@@ -7,6 +7,7 @@ module.exports = {
   checkUserCreds,
   checkUserExists,
   validateUserId,
+  valdateTeamId,
   validateTeamDatastring
 }
 
@@ -63,13 +64,33 @@ function validateUserId(req, res, next) {
       })
       .catch(err => {
           console.log(err);
-          res.status(500).json({ error: "Server error getting user by id"})
+          res.status(500).json({ error: "Server error getting user by id" })
       });
   } else {
       next();
   }
 };
 
+function valdateTeamId(req, res, next) {
+  const { team_id } = req.params;
+  if(team_id) {
+    db.findTeamById(team_id)
+    .then(team => {
+      if(team) {
+        next();
+      } else {
+        res.status(404).json({ error: "Invalid team id" });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: "Server error getting team by id" })
+    });
+  } else {
+    next();
+  }
+};
+
 function validateTeamDatastring(req, res, next) {
   next();
-}
+};
