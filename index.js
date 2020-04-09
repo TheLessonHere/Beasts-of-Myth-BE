@@ -27,6 +27,9 @@ app.use('/api/auth', authRouter);
 const userRouter = require('./routers/users/user-router');
 app.use('/api/user', authenticate, userRouter);
 
+const teamsRouter = require('./routers/teams/teams-router');
+app.use('/api/teams', authenticate, teamsRouter);
+
 // Setting up sockets
 io.on('connection', (socket) => {
   console.log('New connection to the server');
