@@ -2,15 +2,6 @@ const jwt = require('jsonwebtoken');
 const secret = require('../config/secrets');
 const db = require('./helpers');
 
-module.exports = {
-  authenticate,
-  checkUserCreds,
-  checkUserExists,
-  validateUserId,
-  valdateTeamId,
-  validateTeamDatastring
-}
-
 function authenticate (req, res, next) {
   const token = req.headers.authorization;
 
@@ -71,7 +62,7 @@ function validateUserId(req, res, next) {
   }
 };
 
-function valdateTeamId(req, res, next) {
+function validateTeamId(req, res, next) {
   const { team_id } = req.params;
   if(team_id) {
     db.findTeamById(team_id)
@@ -94,3 +85,12 @@ function valdateTeamId(req, res, next) {
 function validateTeamDatastring(req, res, next) {
   next();
 };
+
+module.exports = {
+  authenticate,
+  checkUserCreds,
+  checkUserExists,
+  validateUserId,
+  validateTeamId,
+  validateTeamDatastring
+}
