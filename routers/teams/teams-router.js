@@ -8,9 +8,10 @@ const { validateUserId, validateTeamId, validateTeamDatastring } = require('../.
 router.post('/:user_id', validateUserId, validateTeamDatastring, (req, res) => {
     const { user_id } = req.params;
     const { team_datastring } = req.body;
+    console.log(user_id, team_datastring)
     const team = {
-        user_id: user_id,
-        team_datastring: team_datastring
+        "user_id": user_id,
+        "team_datastring": team_datastring
     };
     db.addTeam(team)
     .then(team => {

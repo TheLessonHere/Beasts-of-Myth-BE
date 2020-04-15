@@ -73,7 +73,6 @@ function findTeamById(team_id) {
 
 function getUserTeams(user_id) {
   return db('teams')
-  .select('*')
   .where('user_id', user_id)
   .orderBy('team_id');
 }
