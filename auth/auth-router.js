@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 
-const db = require('./helpers');
+const db = require('./dbhelpers');
 const generateToken = require('./generateToken');
 const { checkUserCreds, checkUserExists } = require('./middleware');
 

@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const db = require('../../auth/helpers');
+const db = require('../../auth/dbhelpers');
 
 const { validateUserId, validateTeamId, validateTeamDatastring } = require('../../auth/middleware');
 
