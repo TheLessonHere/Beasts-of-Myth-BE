@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
 });
 
 // Declaring port and server.listen
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`\n=== Server listening on port ${PORT} ===\n`);
 });
