@@ -30,9 +30,71 @@ app.use('/api/user', authenticate, userRouter);
 const teamsRouter = require('./routers/teams/teams-router');
 app.use('/api/teams', authenticate, teamsRouter);
 
+// Socket helpers
+const {
+  addPlayerToQueue,
+  removePlayerFromQueue,
+  matchPlayersFromQueue
+} = require('./sockets/queue');
+
+const {
+  createRoom,
+  getRoom,
+  getAllRooms,
+  removeRoom,
+  getPlayersInRoom
+} = require('./sockets/rooms');
+
+// Befor launching, implement node-rate-limiter-flexible to limit how many
+// connections a user can make.
+
 // Setting up sockets
 io.on('connection', (socket) => {
-  console.log('New connection to the server');
+  // Note that a rank can be added to the queue object to ensure proper matchmaking
+  socket.on('enqueue', ({ id, format }, callback) => {
+    const player = {
+      player_id: id,
+      socket_id: socket.id,
+      format: format
+    };
+
+    const queueResult = addPlayerToQueue(player);
+    if(queueResult !== null){
+      // Create a room for the two players and send the room id to them
+    }
+  })
+
+  socket.on('dequeue', ({ id, format }, callback) => {
+    const player = {
+      player_id: id,
+      socket_id: socket.id,
+      format: format
+    };
+
+    removePlayerFromQueue(player);
+  })
+
+  socket.on('join as player', ({ player, room }, callback) => {
+    socket.join(room);
+    socket.to(room).emit('init', { player: player, team: team });
+  })
+
+  socket.on('join as spectator', ({ spectator, room }, callback) => {
+    socket.join(room);
+    socket.to(room).emit('spectator join', spectator);
+  })
+
+  // Add gamelog handling to this event so that the backend sends the log to the client
+  // which then sends it to the server to be stored as a string, and logged
+  socket.on('forfeit', ({ player, room }, callback) => {
+    socket.to(room).emit('player exit', { player: player, action: "forfeit" });
+    socket.leave(room);
+    removeRoom(room);
+  })
+
+  socket.on('player action', ({ room, action }, callback) => {
+    socket.to(room).emit('opponent action', action);
+  })
 
   socket.on('disconnect', () => {
     console.log('User has disconnected');
