@@ -51,32 +51,30 @@ const {
 // Setting up sockets
 io.on('connection', (socket) => {
   // Note that a rank can be added to the queue object to ensure proper matchmaking
-  socket.on('enqueue', ({ id, format }, callback) => {
+  socket.on('enqueue', ({ id, format, team }, callback) => {
     const player = {
       player_id: id,
       socket_id: socket.id,
-      format: format
+      format: format,
+      team: team
     };
 
     const queueResult = addPlayerToQueue(player);
     if(queueResult !== null){
-      // Create a room for the two players and send the room id to them
+      const newRoom = createRoom(queueResult);
+      const roomString = JSON.stringify(newRoom)
+      io.to(queueResult.player1.socket_id).emit('room created', roomString);
+      io.to(queueResult.player2.socket_id).emit('room created', roomString);
     }
   })
 
-  socket.on('dequeue', ({ id, format }, callback) => {
-    const player = {
-      player_id: id,
-      socket_id: socket.id,
-      format: format
-    };
-
-    removePlayerFromQueue(player);
+  socket.on('dequeue', ({ id }, callback) => {
+    removePlayerFromQueue(id);
   })
 
   socket.on('join as player', ({ player, room }, callback) => {
     socket.join(room);
-    socket.to(room).emit('init', { player: player, team: team });
+    socket.to(room).emit('init', player);
   })
 
   socket.on('join as spectator', ({ spectator, room }, callback) => {
