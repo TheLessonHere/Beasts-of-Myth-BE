@@ -8,7 +8,8 @@ const createRoom = ({ player1, player2 }) => {
         room_id: room_id_string,
         player1: player1,
         player2: player2,
-    }
+        spectators: []
+    };
 
     rooms.push(newRoom);
     console.log(`New room ${newRoom.room_id} created.`);
@@ -20,8 +21,8 @@ const getRoom = (room_id) => {
     if(result){
         return result;
     } else {
-        console.log("No room found with that id.")
-        return { error: "No room found with that id."}
+        console.log("No room found with that id.");
+        return { error: "No room found with that id." };
     }
 }
 
@@ -44,7 +45,41 @@ const getPlayersInRoom = (room_id) => {
             player2: result.player2
         };
     } else {
-        console.log("No room found with that id.")
-        return { error: "No room found with that id."}
+        console.log("No room found with that id.");
+        return { error: "No room found with that id." };
     }
+}
+
+const addSpectatorToRoom = ({ room_id, spectator }) => {
+    const result = rooms.find(room => room.room_id === room_id);
+    if(result){
+        result.spectators.push(spectator);
+        console.log(`Spectator added to room ${room_id}.`);
+        return;
+    } else {
+        console.log("No room found with that id.");
+        return { error: "No room found with that id." };
+    }
+}
+
+const getSpectatorsInRoom = (room_id) => {
+    const result = rooms.find(room => room.room_id === room_id);
+    if(result){
+        return {
+            spectators: result.spectators
+        };
+    } else {
+        console.log("No room found with that id.");
+        return { error: "No room found with that id." }
+    }
+}
+
+module.exports = {
+    createRoom,
+    getRoom,
+    getAllRooms,
+    removeRoom,
+    getPlayersInRoom,
+    addSpectatorToRoom,
+    getSpectatorsInRoom
 }

@@ -42,6 +42,5 @@ const matchPlayersFromQueue = () => {
 
 module.exports = {
     addPlayerToQueue,
-    removePlayerFromQueue,
-    matchPlayersFromQueue
+    removePlayerFromQueue
 }
