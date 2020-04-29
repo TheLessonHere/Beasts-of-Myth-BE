@@ -76,13 +76,13 @@ io.on('connection', (socket) => {
 
   socket.on('join as player', ({ playerNum, player, room_id }, callback) => {
     socket.join(room_id);
-    socket.to(room_id).emit('init', { playerNum: playerNum, player: player });
+    console.log(`User has joined room ${room_id}.`);
   })
 
   socket.on('join as spectator', ({ spectator, room_id }, callback) => {
     socket.join(room_id);
     addSpectatorToRoom({ room_id: room_id, spectator: spectator });
-    socket.to(room_id).emit('spectator join', spectator);
+    io.to(room_id).emit('spectator join', spectator);
   })
 
   socket.on('see spectators', ({ room_id }, callback) => {
