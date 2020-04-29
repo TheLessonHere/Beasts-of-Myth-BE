@@ -3,6 +3,8 @@ let queue = [];
 const addPlayerToQueue = (player) => {
     queue.push(player);
 
+    console.log(queue);
+
     if(queue.length >= 2){
         return matchPlayersFromQueue();
     }
@@ -11,11 +13,17 @@ const addPlayerToQueue = (player) => {
     return null;
 }
 
-const removePlayerFromQueue = (player) => {
-    const playerIndex = queue.findIndex(qPlayer => qPlayer.player_id === player.player_id);
-    queue.splice(playerIndex, 1);
+const removePlayerFromQueue = (player_id) => {
+    const playerIndex = queue.findIndex(qPlayer => qPlayer.player_id === player_id);
 
-    console.log(`Player ${player.player_id} removed from the queue.`)
+    if(playerIndex){
+        queue.splice(playerIndex, 1);
+
+        console.log(`Player ${player_id} removed from the queue.`);
+    } else {
+        console.log("No player found with that id.")
+        return { error: "No player found with that id." }
+    }
 }
 
 const matchPlayersFromQueue = () => {
@@ -34,6 +42,5 @@ const matchPlayersFromQueue = () => {
 
 module.exports = {
     addPlayerToQueue,
-    removePlayerFromQueue,
-    matchPlayersFromQueue
+    removePlayerFromQueue
 }

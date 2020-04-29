@@ -33,8 +33,7 @@ app.use('/api/teams', authenticate, teamsRouter);
 // Socket helpers
 const {
   addPlayerToQueue,
-  removePlayerFromQueue,
-  matchPlayersFromQueue
+  removePlayerFromQueue
 } = require('./sockets/queue');
 
 const {
@@ -42,7 +41,9 @@ const {
   getRoom,
   getAllRooms,
   removeRoom,
-  getPlayersInRoom
+  getPlayersInRoom,
+  addSpectatorToRoom,
+  getSpectatorsInRoom
 } = require('./sockets/rooms');
 
 // Befor launching, implement node-rate-limiter-flexible to limit how many
@@ -50,38 +51,44 @@ const {
 
 // Setting up sockets
 io.on('connection', (socket) => {
+  console.log("User has connected.");
   // Note that a rank can be added to the queue object to ensure proper matchmaking
-  socket.on('enqueue', ({ id, format }, callback) => {
+  socket.on('enqueue', ({ id, username, format, team }, callback) => {
     const player = {
       player_id: id,
       socket_id: socket.id,
-      format: format
+      username: username,
+      format: format,
+      team: team
     };
 
     const queueResult = addPlayerToQueue(player);
     if(queueResult !== null){
-      // Create a room for the two players and send the room id to them
+      const newRoom = createRoom(queueResult);
+      io.to(queueResult.player1.socket_id).emit('room created', newRoom);
+      io.to(queueResult.player2.socket_id).emit('room created', newRoom);
     }
   })
 
-  socket.on('dequeue', ({ id, format }, callback) => {
-    const player = {
-      player_id: id,
-      socket_id: socket.id,
-      format: format
-    };
-
-    removePlayerFromQueue(player);
+  socket.on('dequeue', ({ id }, callback) => {
+    removePlayerFromQueue(id);
   })
 
-  socket.on('join as player', ({ player, room }, callback) => {
-    socket.join(room);
-    socket.to(room).emit('init', { player: player, team: team });
+  socket.on('join as player', ({ playerNum, player, room_id }, callback) => {
+    socket.join(room_id);
+    socket.to(room_id).emit('init', { playerNum: playerNum, player: player });
   })
 
-  socket.on('join as spectator', ({ spectator, room }, callback) => {
-    socket.join(room);
-    socket.to(room).emit('spectator join', spectator);
+  socket.on('join as spectator', ({ spectator, room_id }, callback) => {
+    socket.join(room_id);
+    addSpectatorToRoom({ room_id: room_id, spectator: spectator });
+    socket.to(room_id).emit('spectator join', spectator);
+  })
+
+  socket.on('see spectators', ({ room_id }, callback) => {
+    const result = getSpectatorsInRoom(room_id);
+    const resultString = JSON.stringify(result);
+    io.to(socket.id).emit('spectator list', resultString);
   })
 
   // Add gamelog handling to this event so that the backend sends the log to the client
