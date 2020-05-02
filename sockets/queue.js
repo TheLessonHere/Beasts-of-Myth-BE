@@ -15,11 +15,9 @@ const addPlayerToQueue = (player) => {
 
 const removePlayerFromQueue = (player_id) => {
     const playerIndex = queue.findIndex(qPlayer => qPlayer.player_id === player_id);
-
-    if(playerIndex){
-        queue.splice(playerIndex, 1);
-
+    if(playerIndex !== undefined){
         console.log(`Player ${player_id} removed from the queue.`);
+        queue.splice(playerIndex, 1);
     } else {
         console.log("No player found with that id.")
         return { error: "No player found with that id." }
