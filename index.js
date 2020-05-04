@@ -100,7 +100,16 @@ io.on('connection', (socket) => {
   })
 
   socket.on('player action', ({ room, action }, callback) => {
-    socket.to(room).emit('opponent action', action);
+    const players = getPlayersInRoom(room);
+    console.log(players);
+    if(players && players.player1.socket_id === socket.id){
+      io.to(players.player2.socket_id).emit('opponent action', action);
+    }
+    else if(players && players.player2.socket_id === socket.id){
+      io.to(players.player1.socket_id).emit('opponent action', action);
+    } else {
+      console.log('Error sending player action.')
+    }
   })
 
   socket.on('disconnect', () => {
