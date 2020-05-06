@@ -112,6 +112,19 @@ io.on('connection', (socket) => {
     }
   })
 
+  socket.on('post ko switch', ({ room, action }, callback) => {
+    const players = getPlayersInRoom(room);
+    console.log(players);
+    if(players && players.player1.socket_id === socket.id){
+      io.to(players.player2.socket_id).emit('opponent post ko', action);
+    }
+    else if(players && players.player2.socket_id === socket.id){
+      io.to(players.player1.socket_id).emit('opponent post ko', action);
+    } else {
+      console.log('Error sending opponent post ko action.')
+    }
+  })
+
   socket.on('disconnect', () => {
     console.log('User has disconnected');
   })
