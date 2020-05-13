@@ -99,6 +99,14 @@ io.on('connection', (socket) => {
     removeRoom(room);
   })
 
+  socket.on('chat message', ({ room, message, username }, callback) => {
+    const messageObj = {
+      message: message,
+      username: username
+    }
+    socket.to(room).emit('player message', messageObj);
+  })
+
   socket.on('player action', ({ room, action }, callback) => {
     const players = getPlayersInRoom(room);
     console.log(players);
@@ -110,54 +118,6 @@ io.on('connection', (socket) => {
     } else {
       console.log('Error sending player action.')
     }
-  })
-
-  socket.on('crit roll', ({room, playerNum, critRolls}, callback) => {
-    const rollCrit = (critRolls) => {
-      const getRandomInt = (min, max) => {
-          min = Math.ceil(min);
-          max = Math.floor(max);
-          return Math.floor(Math.random() * (max - min + 1)) + min;
-      }
-
-      switch(critRolls){
-          case 0:
-              return false;
-          case 1:
-              let randomInt25 = getRandomInt(1, 4);
-              if(randomInt25 === 1){
-                  randomInt25 = true;
-              } else {
-              randomInt25 = false;
-              };
-              return randomInt25;
-          case 2:
-              let randomInt50 = getRandomInt(1, 2);
-              if(randomInt50 === 1){
-                  randomInt50 = true;
-              } else {
-              randomInt50 = false;
-              };
-              return randomInt50;
-          case 3:
-              let randomInt75 = getRandomInt(1, 4);
-              if(randomInt75 === 1){
-                  randomInt75 = false;
-              } else {
-              randomInt75 = true;
-              };
-              return randomInt75;
-          case 4:
-              return true;
-      }
-    }
-
-    const critRoll = rollCrit(critRolls);
-    const result = {
-      critResult: critRoll,
-      playerNum: playerNum
-    }
-    io.to(room).emit(`crit result`, result);
   })
 
   socket.on('post ko switch', ({ room, action }, callback) => {
