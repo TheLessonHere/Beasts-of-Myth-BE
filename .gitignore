@@ -13,8 +13,6 @@ secrets.js
 
 # data
 *.db3
-data/migrations/
-data/seeds/
 
 npm-debug.log*
 yarn-debug.log*
