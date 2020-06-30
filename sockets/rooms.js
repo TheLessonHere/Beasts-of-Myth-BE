@@ -21,13 +21,29 @@ const getRoom = (room_id) => {
     if(result){
         return result;
     } else {
-        console.log("No room found with that id.");
         return { error: "No room found with that id." };
     }
 }
 
 const getAllRooms = () => {
     return rooms;
+}
+
+const findRoomWithPlayer = (socket_id) => {
+    const roomWithPlayer = rooms.find(room => room.player1.socket_id === socket_id || room.player2.socket_id === socket_id);
+    if(roomWithPlayer){
+        return {
+            room_id: roomWithPlayer.room_id,
+            player1: roomWithPlayer.player1,
+            player2: roomWithPlayer.player2,
+            spectators: roomWithPlayer.spectators
+        };
+    } else {
+        console.log("No room found with that socket id.")
+        return {
+            error: "No room found with that socket id."
+        };
+    }
 }
 
 const removeRoom = (room_id) => {
@@ -78,6 +94,7 @@ module.exports = {
     createRoom,
     getRoom,
     getAllRooms,
+    findRoomWithPlayer,
     removeRoom,
     getPlayersInRoom,
     addSpectatorToRoom,
