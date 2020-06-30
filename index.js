@@ -40,6 +40,7 @@ const {
   createRoom,
   getRoom,
   getAllRooms,
+  findRoomWithPlayer,
   removeRoom,
   getPlayersInRoom,
   addSpectatorToRoom,
@@ -94,7 +95,8 @@ io.on('connection', (socket) => {
   // Add gamelog handling to this event so that the backend sends the log to the client
   // which then sends it to the server to be stored as a string, and logged
   socket.on('forfeit', ({ player, room }, callback) => {
-    socket.to(room).emit('player exit', { player: player, action: "forfeit" });
+    console.log('User has forfeited.');
+    socket.to(room).emit('player exit', { playerInfo: player, action: "forfeit" });
     socket.leave(room);
     removeRoom(room);
   })
@@ -134,7 +136,23 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    console.log('User has disconnected');
+    const result = findRoomWithPlayer(socket.id);
+    if(result.room_id){
+      const room = result.room_id;
+      if(result.player1.socket_id === socket.id){
+        console.log(`${result.player1.username} disconnected and loses by forfeit.`);
+        socket.to(room).emit('player exit', { playerInfo: result.player1, action: "forfeit" });
+        socket.leave(room);
+        removeRoom(room);
+      } else {
+        console.log(`${result.player2.username} disconnected and loses by forfeit.`);
+        socket.to(room).emit('player exit', { playerInfo: result.player2, action: "forfeit" });
+        socket.leave(room);
+        removeRoom(room);
+      }
+    } else {
+      console.log(result.error);
+    }
   })
 });
 
