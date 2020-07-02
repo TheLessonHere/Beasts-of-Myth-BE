@@ -94,11 +94,11 @@ io.on('connection', (socket) => {
 
   // Add gamelog handling to this event so that the backend sends the log to the client
   // which then sends it to the server to be stored as a string, and logged
-  socket.on('forfeit', ({ player, room }, callback) => {
+  socket.on('forfeit', ({ player, room_id }, callback) => {
     console.log('User has forfeited.');
-    socket.to(room).emit('player exit', { playerInfo: player, action: "forfeit" });
-    socket.leave(room);
-    removeRoom(room);
+    socket.to(room_id).emit('player exit', { playerInfo: player, action: "forfeit" });
+    socket.leave(room_id);
+    removeRoom(room_id);
   })
 
   socket.on('chat message', ({ room, message, username }, callback) => {
